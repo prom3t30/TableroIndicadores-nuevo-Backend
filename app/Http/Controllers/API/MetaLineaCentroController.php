@@ -8,6 +8,13 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\MetaLineaCentro as MetaLineaCentroResource;
 use App\Http\Resources\MetaLineaCentroCollection;
 
+use App\Http\Resources\CentroCollection;
+
+
+
+//importamos
+use Illuminate\Support\Facades\DB;
+use SebastianBergmann\Environment\Console;
 
 class MetaLineaCentroController extends Controller
 {
@@ -16,10 +23,26 @@ class MetaLineaCentroController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        return new MetaLineaCentroCollection(MetaLineaCentro::all());
+
+        $idLinea = $request->metaxLinea_id;
+        //var_dump($idLinea);
+
+
+
+        $response = MetaLineaCentro::join('centros', 'MetaLineaCentro.centro_id', '=', 'centros.id')
+            ->select('MetaLineaCentro.*', 'centros.*')
+            ->where('MetaLineaCentro.metaxLinea_id', '=', $request->metaxLinea_id)
+            ->get();
+        var_dump($response);
+
+
+        //return response()->json($response, 200);
     }
+
+
+
 
     /**
      * Show the form for creating a new resource.
@@ -46,8 +69,15 @@ class MetaLineaCentroController extends Controller
             $MetaLineaCentro->usuarioCreacion = $request->usuarioCreacion;  //Guarda el id del usuario que lo guardo {num}
             $MetaLineaCentro->save();   //Inserta el objeto en la base de datos.
         }
+
+        $response = MetaLineaCentro::join('centros', 'MetaLineaCentro.centro_id', '=', 'centros.id')
+            ->select('MetaLineaCentro.*', 'centros.*')
+            ->where('MetaLineaCentro.metaxLinea_id', '=', $request->metaxLinea_id)
+            ->get();
+
         //Código de respuesta de estado satisfactorio HTTP 200 OK indica que la solicitud ha tenido éxito.
-        return response()->json("OK", 200);
+        //return response()->json("OK", 200);
+        return response()->json(["OK", $response], 200);
     }
 
     /**
@@ -57,6 +87,8 @@ class MetaLineaCentroController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+
+    /*     // update anterior d
     public function update(Request $request, $id)
     {
         $request->validate([
@@ -69,7 +101,25 @@ class MetaLineaCentroController extends Controller
         return (new MetaLineaCentroResource($MetaLineaCentro))
             ->response()
             ->setStatusCode(202);
+    } */
+
+    public function update(Request $request)
+    {
+
+        $request->validate([
+            'Nombre' => 'required|max:255',
+
+        ]);
+
+        $MetaLineaCentro = MetaLineaCentro::where('centro_id', '=', $request->centro_id)->first();
+        $MetaLineaCentro->update($request->all());
+        $MetaLineaCentro = MetaLineaCentro::where('centro_id', '=', $request->centro_id)->first();
+
+        return (new MetaLineaCentroResource($MetaLineaCentro))
+            ->response()
+            ->setStatusCode(202);
     }
+
 
     /**
      * Remove the specified resource from storage.

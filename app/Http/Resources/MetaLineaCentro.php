@@ -15,15 +15,17 @@ class MetaLineaCentro extends JsonResource
     public function toArray($request)
     {
         return [
-            'id' => $this->id,#
-            'metaxLinea_id' => $this->metaxLinea_id,#
-            'centro_id' => $this->centro_id,#
+            'id' => $this->id, #
+            'metaxLinea_id' => $this->metaxLinea_id, #
+            'centro_id' => $this->centro_id, #
             'metaCentro' => $this->metaCentro,
             'saved' => $this->saved,
             'usuarioCreacion' => $this->usuarioCreacion,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            'deleted_at' => $this->deleted_at
+            'deleted_at' => $this->deleted_at,
+            'Nombre'     => $this->Nombre,
+
         ];
     }
 }

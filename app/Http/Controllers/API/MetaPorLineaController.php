@@ -44,6 +44,7 @@ class MetaPorLineaController extends Controller
                 $ajusteMetaLinea->aprobacion = 1;
                 $ajusteMetaLinea->usuarioModificacion = $Request->user;
                 $ajusteMetaLinea->fechaCreacion = now(); //date("Y/m/d");
+                $ajusteMetaLinea->fechaUltimaModificacion = now(); //date("Y/m/d");
                 $ajusteMetaLinea->estado = $item["selected"];
                 $ajusteMetaLinea->save();
 

@@ -5,6 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+
+use App\Models\Centro;
+
+
 class MetaLineaCentro extends Model
 {
     use SoftDeletes;
@@ -20,4 +24,11 @@ class MetaLineaCentro extends Model
         'update_at',
         'delete_at',
     ];
+
+    //realcion con la tabla Centro
+    public function centros()
+    {
+        return $this->belongsTo(Centro::class,  'id', 'centro_id');
+        //return $this->belongsTo('App\Models\centros');
+    }
 }

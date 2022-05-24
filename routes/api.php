@@ -5,6 +5,9 @@ use App\Http\Controllers\API\AplicacionController;
 use App\Http\Controllers\API\CategoriaController;
 use App\Http\Controllers\API\CategoriaEventoController;
 use App\Http\Controllers\API\CentroController;
+//improtamos el controlador del subdirector
+use App\Http\Controllers\API\SubdirectorController;
+
 use App\Http\Controllers\API\ClasificacionController;
 use App\Http\Controllers\API\ClienteController;
 use App\Http\Controllers\API\DetalleEjecucionIndicadorController;
@@ -107,6 +110,12 @@ Route::get('/centros/{id}', [CentroController::class, 'getById']);
 Route::put('/centros', [CentroController::class, 'update']);
 Route::delete('/centros/{id}', [CentroController::class, 'delete']);
 
+
+// rutas Subdirector
+Route::get('/subdirector', [SubdirectorController::class, 'index']);
+
+
+
 //rutas para servicio de pantallas
 Route::get('/pantallas', [PantallaController::class, 'index']);
 Route::get('/pantallas/indexById/{id}', [PantallaController::class, 'indexById']);
@@ -190,6 +199,17 @@ Route::post('/ejecucionIndicador/getMetasEsperadasPorLineaPorAnio', [EjecucionIn
 Route::post('/ejecucionIndicador/getIndicadoresMetaLinea', [EjecucionIndicadorController::class, 'getIndicadoresMetaLinea']);
 
 
+//rutas para servicio de ejecución IndicadorXCentroXLinea
+Route::post('/ejecucionIndicador/getMetasEsperadasPorLineaPorAnioPorCentro', [EjecucionIndicadorController::class, 'getMetasEsperadasPorLineaPorAnioPorCentro']);
+
+Route::post('/ejecucionIndicador/ejecucionPorLineaPorCentro', [EjecucionIndicadorController::class, 'ejecucionPorLineaPorCentro']);
+
+// ejecucion de indicador por centro por linea y subdirector
+Route::put('/ejecucionIndicador/ejecucionPorLineaPorCentroPorSub', [EjecucionIndicadorController::class, 'ejecucionPorLineaPorCentroPorSub']);
+
+
+
+
 //rutas para servicio de Meta Esperada en Línea
 Route::get('/metaEsperadaEnLinea', [MetaEsperadaEnLineaController::class, 'index']);
 Route::post('/metaEsperadaEnLinea', [MetaEsperadaEnLineaController::class, 'create']);
@@ -245,7 +265,12 @@ Route::delete('/categoriaevento/{id}', [CategoriaEventoController::class, 'delet
 
 Route::get('/metalineacentro', [MetaLineaCentroController::class, 'index']);
 Route::post('/metalineacentro', [MetaLineaCentroController::class, 'create']);
+// put anterior
+//Route::put('/metalineacentro', [MetaLineaCentroController::class, 'update']);
+
+//put  nuevo
 Route::put('/metalineacentro', [MetaLineaCentroController::class, 'update']);
+
 Route::delete('/metalineacentro/{id}', [MetaLineaCentroController::class, 'delete']);
 
 //Rutas de proyectoevaluar

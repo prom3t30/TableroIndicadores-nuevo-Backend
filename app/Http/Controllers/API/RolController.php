@@ -57,6 +57,7 @@ class RolController extends Controller
                 privilegios.funcion_id = funcions.id
                 ORDER BY aplicacion ASC"
         ));
+        //print_r($consulta2);
         return $consulta2;
     }
 

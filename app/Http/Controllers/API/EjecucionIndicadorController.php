@@ -12,6 +12,20 @@ use App\Http\Resources\EjecucionIndicador as EjecucionIndicadorResource;
 use App\Http\Resources\EjecucionIndicadorCollection;
 use Illuminate\Support\Facades\Log;
 
+
+use Illuminate\Support\Facades\DB;
+
+// modelo para poder llamr la tabal metalineacentro
+use App\Models\MetaLineaCentro;
+
+//modelo centro
+use App\Models\Centro;
+
+
+// modelo usuario
+use App\Models\User;
+use PhpOffice\PhpSpreadsheet\Calculation\MathTrig\Sum;
+
 class EjecucionIndicadorController extends Controller
 {
     public function index()
@@ -104,6 +118,156 @@ class EjecucionIndicadorController extends Controller
         Log::debug($valores);
 
         return response()->json($valores, 202);
+    }
+
+
+    // ----------------- Mi funcion  ----------------------------- //
+    public function getMetasEsperadasPorLineaPorAnioPorCentro(Request $request)
+    {
+
+        //lnea programatica
+        $linProgramatica = $request->lineaProgramatica;
+        //var_dump($linProgramatica);
+
+        //usuario
+        $usuario =  $request->usu;
+        //ar_dump($usuario);
+
+        // id Usuario
+        $id = $request->ides;
+        //var_dump($id);
+
+        // año
+        $year = $request->year;
+
+        // indicador
+        $indicador = $request->getIndicadoresMetaLinea;
+
+        // id del centro
+        $IDCENTRO = DB::table('centros')
+            ->select('id')
+            ->where('ResponsableCentro', '=', $id)
+            ->first();
+        //var_dump($IDCENTRO);
+
+        // convertimos el objeto anterior en un arreglo para poderlo pasar al selecte
+        // siguiente que nos trae  las metas por linea por centro y por el id del centro
+        $IDCENTRO = json_decode(json_encode($IDCENTRO), true);
+        //var_dump($IDCENTRO);
+
+
+
+        $idMetalineaCentro = DB::table('metalineacentro')
+            ->join('centros', 'metalineacentro.centro_id', '=', 'centros.id')
+            ->select('metalineacentro.metaxLinea_id')
+            ->where('metalineacentro.centro_id', '=', $IDCENTRO)
+            ->where('metalineacentro.metaxLinea_id', '=', $linProgramatica)
+            ->get();
+        //var_dump($idMetalineaCentro);
+
+        $idMetLinCetr = json_decode(json_encode($idMetalineaCentro), true);
+        //var_dump($idMetLinCetr);
+
+
+        $ejecucion = DB::table('ejecucionmetacentro')
+            ->select('ejecucionmetacentro.*')
+            ->where('metaLineaCentro_id', '=', $idMetLinCetr)
+            ->get();
+        //var_dump($ejecucion);
+
+
+        $acumE = DB::table('ejecucionmetacentro')
+            ->select('ejecucionmetacentro.valorejecucionrealizada')
+            ->where('metaLineaCentro_id', '=', $idMetLinCetr)
+            ->Sum('valorejecucionrealizada');
+
+        // SELECIONAR NOMBRE DE LA LINEA PROGRAMATICA
+        $LinProgr = DB::table('lineaprogramatica')
+            ->select('lineaprogramatica.Nombre')
+            ->where('lineaprogramatica.id', '=', $linProgramatica)
+            ->get();
+
+
+        // funcional -------------------------------------
+        $response = DB::table('metalineacentro')
+            ->join('centros', 'metalineacentro.centro_id', '=', 'centros.id')
+            ->select('metalineacentro.*', 'centros.*', 'centros.id as idCentro')
+            ->where('metalineacentro.centro_id', '=', $IDCENTRO)
+            ->where('metalineacentro.metaxLinea_id', '=', $linProgramatica)
+            ->get();
+        //var_dump($response);
+
+        return response()->json([$response, $ejecucion, $acumE, $LinProgr], 200);
+    }
+
+    // ----------------- FIN Mi funcion  ----------------------------- //
+
+
+    public function ejecucionPorLineaPorCentro(Request $request)
+    {
+
+        $this->validate($request, [
+            'ejecucion' => 'required',
+            'url' => 'required'
+
+        ]);
+
+        /*         $id = $request->id;
+        var_dump($id);
+        $eje = $request->ejecucionEne;
+        var_dump($eje);
+
+        $mes = $request->mes;
+        var_dump($mes);
+
+        $urlEne = $request->urlEne;
+        var_dump($urlEne); */
+
+
+        $metaxLinea_id = $request->metaxLinea_id;
+        $year = $request->year;
+        $mes = $request->mes;
+        $eje = $request->ejecucion;
+        $url = $request->url;
+
+
+
+
+
+        $valorBtn = $request->valorBtn;
+        //var_dump($valorBtn);
+
+
+
+        DB::table('ejecucionmetacentro')->insert([
+            'metaLineaCentro_id' => $metaxLinea_id,
+            'year' => $year,
+            'mes' => $mes,
+            'valorejecucionrealizada' => $eje,
+            'link' => $url,
+
+        ]);
+
+        //
+
+
+    }
+
+    public function ejecucionPorLineaPorCentroPorSub(Request $request)
+    {
+        $request->validate([
+            'valorejecucionrealizada' => 'required',
+            'link' => 'required|max:500',
+        ]);
+
+
+        // Editamos la meta del mes segun si ID de la tabla ejecucionmetacentro
+        $Editar = DB::table('ejecucionmetacentro')
+            ->select('ejecucionmetacentro.id')
+            ->where('ejecucionmetacentro.id', '=', $request->id)
+            ->update($request->all());
+
+        return response()->json($Editar, 200);
     }
 
     public function getIndicadoresMetaLinea(Request $request)
