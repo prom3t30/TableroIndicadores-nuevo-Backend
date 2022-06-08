@@ -57,6 +57,30 @@ class MetaLineaCentroController extends Controller
             'usuarioCreacion' => 'required',
         ]);
 
+        // --------------------- codigo copiado   //
+        $linea_id = $request->metaxLinea_id;
+
+        $metaxlinea   = $request->metaxlinea;
+        //echo $metaxlinea;
+        //var_dump($metaxlinea);
+
+        $respo = DB::table('metaxlinea')
+            ->select('metaxlinea.id')
+            ->where('metaxlinea.linea_id', '=', $linea_id)
+            ->where('metaxlinea.metaLinea', '=', $metaxlinea)
+            ->first();
+        var_dump($respo);
+
+        $IDE = json_decode(json_encode($respo), true);
+        //var_dump($IDE);
+
+        // extraemos el ID  del array para poderlo pasar al forEach
+        $string = implode(" ", $IDE);
+        //echo $string;
+
+
+        //------------------------- fin  codigo copiado   //
+
         $mpc = $request->mporcentro;
 
         foreach ($mpc as $iterador => $meta) {
@@ -65,8 +89,12 @@ class MetaLineaCentroController extends Controller
             $MetaLineaCentro->centro_id = $mpc[$iterador]["centro"]["id"];  //Guarda el identificador unico del centro {num}
             $MetaLineaCentro->metaCentro = $mpc[$iterador]["metaCentro"];   //Guarda la meta del cetro {num}
             $MetaLineaCentro->saved = true; //confima que esta guardado {bolean}
-            $MetaLineaCentro->metaXLinea_id = $request->metaxLinea_id;  //Guarda el identificador unico de la linea {num}
+            //$MetaLineaCentro->metaXLinea_id = $request->metaxLinea_id;  //Guarda el identificador unico de la linea {num}
+            $MetaLineaCentro->metaXLinea_id = $string;  //Guarda el identificador unico de la linea {num}
+
             $MetaLineaCentro->usuarioCreacion = $request->usuarioCreacion;  //Guarda el id del usuario que lo guardo {num}
+            // agregamos una columna con el id de la linea
+            $MetaLineaCentro->lineaProgramatica = $linea_id;
             $MetaLineaCentro->save();   //Inserta el objeto en la base de datos.
         }
 

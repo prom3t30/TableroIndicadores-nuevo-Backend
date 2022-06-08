@@ -141,7 +141,10 @@ class EjecucionIndicadorController extends Controller
         $year = $request->year;
 
         // indicador
-        $indicador = $request->getIndicadoresMetaLinea;
+        //$indicador = $request->getIndicadoresMetaLinea;
+
+        // el anterior lo modifique por este
+        $indicador = $request->indicador;
 
         // id del centro
         $IDCENTRO = DB::table('centros')
@@ -155,18 +158,22 @@ class EjecucionIndicadorController extends Controller
         $IDCENTRO = json_decode(json_encode($IDCENTRO), true);
         //var_dump($IDCENTRO);
 
-
+        $IDCENTRO = implode(" ", $IDCENTRO);
+        //echo $IDCENTRO;
 
         $idMetalineaCentro = DB::table('metalineacentro')
             ->join('centros', 'metalineacentro.centro_id', '=', 'centros.id')
             ->select('metalineacentro.metaxLinea_id')
             ->where('metalineacentro.centro_id', '=', $IDCENTRO)
-            ->where('metalineacentro.metaxLinea_id', '=', $linProgramatica)
-            ->get();
+            ->where('metalineacentro.lineaProgramatica', '=', $linProgramatica)
+            ->first();
         //var_dump($idMetalineaCentro);
 
         $idMetLinCetr = json_decode(json_encode($idMetalineaCentro), true);
         //var_dump($idMetLinCetr);
+        $idMetLinCetr = implode(" ", $idMetLinCetr);
+        //echo $idMetLinCetr;
+
 
 
         $ejecucion = DB::table('ejecucionmetacentro')
@@ -174,6 +181,7 @@ class EjecucionIndicadorController extends Controller
             ->where('metaLineaCentro_id', '=', $idMetLinCetr)
             ->get();
         //var_dump($ejecucion);
+        //echo $ejecucion;
 
 
         $acumE = DB::table('ejecucionmetacentro')
@@ -193,7 +201,7 @@ class EjecucionIndicadorController extends Controller
             ->join('centros', 'metalineacentro.centro_id', '=', 'centros.id')
             ->select('metalineacentro.*', 'centros.*', 'centros.id as idCentro')
             ->where('metalineacentro.centro_id', '=', $IDCENTRO)
-            ->where('metalineacentro.metaxLinea_id', '=', $linProgramatica)
+            ->where('metalineacentro.lineaProgramatica', '=', $linProgramatica)
             ->get();
         //var_dump($response);
 
